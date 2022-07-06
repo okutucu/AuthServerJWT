@@ -8,7 +8,7 @@ using AuthServer.Core.Service;
 
 namespace AuthServer.Core.Services
 {
-    public interface IUserAppService : IService<UserApp>
+    public interface IUserAppService 
     {
     }
 }
