@@ -10,6 +10,7 @@ using AuthServer.Core.Models;
 using AuthServer.Core.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using SharedLibrary.Configurations;
 
 namespace AuthServer.Service.Services
@@ -35,7 +36,7 @@ namespace AuthServer.Service.Services
             return Convert.ToBase64String(numberByte);
         }
 
-        private IEnumerable<Claim> GetClaim(UserApp userApp,List<String> audiences)
+        private IEnumerable<Claim> GetClaims(UserApp userApp,List<String> audiences)
         {
             List<Claim> userList = new List<Claim>
             {
@@ -49,14 +50,56 @@ namespace AuthServer.Service.Services
 
             return userList;
 
+        }  
+
+        private IEnumerable<Claim> GetClaimByClient(Client client)
+        {
+            List<Claim> claims = new List<Claim>();
+
+            claims.AddRange(client.Audiences.Select(x => new Claim(JwtRegisteredClaimNames.Aud, x)));
+
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString());
+            new Claim(JwtRegisteredClaimNames.Sub,client.Id.ToString());
+
+            return claims;
         }
 
         public TokenDto CreateToken(UserApp userApp)
         {
-            throw new NotImplementedException();
+            DateTime accessTokenExpiration = DateTime.Now.AddMinutes(_tokenOption.AccessTokenExpiration);
+            DateTime refleshTokenExpiration = DateTime.Now.AddMinutes(_tokenOption.RefreshTokenExpiration);
+
+            SecurityKey securityKey = SignService.GetSymmetricSecurityKey(_tokenOption.SecurityKey);
+
+            SigningCredentials signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+
+            JwtSecurityToken jwtSecurityToken = new JwtSecurityToken
+                (
+                issuer : _tokenOption.Issuer,
+                expires : accessTokenExpiration,
+                notBefore : DateTime.Now,
+                claims : GetClaims(userApp, _tokenOption.Audience),
+                signingCredentials : signingCredentials
+                );
+
+            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+
+            string token = handler.WriteToken(jwtSecurityToken);
+
+            TokenDto tokenDto = new TokenDto
+            {
+                AccessToken = token,
+                RefreshToken  = CreateRefreshToken(),
+                AccessTokenExpiration = accessTokenExpiration,
+                RefreshTokenExpiration =refleshTokenExpiration
+            };
+
+            return tokenDto;
+
+                
         }
 
-        public ClientTokenDto CreateToken(Client client)
+        public ClientTokenDto CreateTokenByClient(Client client)
         {
             throw new NotImplementedException();
         }
