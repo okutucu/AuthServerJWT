@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AuthServer.Core.Configurations;
 using AuthServer.Core.DTOs;
@@ -63,14 +64,29 @@ namespace AuthServer.Service.Services
             return ResponseDto<TokenDto>.Success(token, 200);
 
         }
-        public Task<ResponseDto<ClientTokenDto>> CreateTokenByClient(ClientLoginDto clientLoginDto)
+
+        public ResponseDto<ClientTokenDto> CreateTokenByClient(ClientLoginDto clientLoginDto)
         {
-            throw new System.NotImplementedException();
+            Client client = _client.SingleOrDefault(x => x.Id == clientLoginDto.ClientId && x.Secret == clientLoginDto.ClientSecret);
+
+            if(client == null)
+            {
+                return ResponseDto<ClientTokenDto>.Fail("ClientId or ClientSecret not found",404,true);
+            }
+
+
+            ClientTokenDto token = _tokenService.CreateTokenByClient(client);
+
+            return ResponseDto<ClientTokenDto>.Success(token, 200);
+
+
         }
+
         public Task<ResponseDto<TokenDto>> CreateTokenByRefreshTokenAsync(string refreshToken)
         {
             throw new System.NotImplementedException();
         }
+
         public Task<ResponseDto<NoDataDto>> RevokeRefreshTokenAsync(string refreshToken)
         {
             throw new System.NotImplementedException();
