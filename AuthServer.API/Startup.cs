@@ -18,7 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using SharedLibrary.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-
+using SharedLibrary.Services;
 
 namespace AuthServer.API
 {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 
-namespace AuthServer.Service.Services
+namespace SharedLibrary.Services
 {
     public static class SignService
     {
