@@ -11,12 +11,13 @@ namespace MiniApp2.API.Controllers
     [ApiController]
     public class InvoiceController : ControllerBase
     {
+        [HttpGet]
         public IActionResult GetInvoices()
         {
             string userName = HttpContext.User.Identity.Name;
-            Claim userId = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+            Claim userIdClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
 
-            return Ok($"Invoice => UserName : {userName} - UserId : {userId}");
+            return Ok($"Invoice => UserName : {userName} - UserId : {userIdClaim.Value}");
         }
     }
 }

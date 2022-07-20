@@ -11,12 +11,13 @@ namespace MiniApp1.API.Controllers
     [ApiController]
     public class StockController : ControllerBase
     {
+        [HttpGet]
         public IActionResult GetStock()
         {
             string userName = HttpContext.User.Identity.Name;
-            Claim userId = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+            Claim userIdClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
 
-            return Ok($"Stock  => UserName : {userName} - UserId : {userId}");
+            return Ok($"Stock  => UserName : {userName} - UserId : {userIdClaim.Value}");
         }
     }
 }
