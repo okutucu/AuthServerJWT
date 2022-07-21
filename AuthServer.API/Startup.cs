@@ -20,6 +20,7 @@ using SharedLibrary.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using SharedLibrary.Services;
 using FluentValidation.AspNetCore;
+using SharedLibrary.Extensions;
 
 namespace AuthServer.API
 {
@@ -85,11 +86,14 @@ namespace AuthServer.API
             });
 
 
+          
+
 
             services.AddControllers().AddFluentValidation(options =>
             {
                 options.RegisterValidatorsFromAssemblyContaining<Startup>();
             });
+            services.UseCustomValidationResponse();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AuthServer.API", Version = "v1" });
